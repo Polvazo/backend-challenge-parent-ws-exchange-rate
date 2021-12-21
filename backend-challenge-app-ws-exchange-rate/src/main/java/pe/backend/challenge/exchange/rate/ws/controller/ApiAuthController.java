@@ -36,11 +36,6 @@ public class ApiAuthController {
 		return userDTO;
 	}
 	
-	@PostMapping(ApplicationEndPoints.RESOURCE_USER +"s")
-	public String login2(@RequestBody UserDTO userDTO) {
-		return "hola";
-	}
-	
 	private String getJWTToken(String username) {
 		String secretKey = SECRET;
 		List<GrantedAuthority> grantedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_USER");
