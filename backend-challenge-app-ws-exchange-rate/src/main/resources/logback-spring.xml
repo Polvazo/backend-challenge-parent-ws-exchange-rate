@@ -1,46 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+	<include
+		resource="org/springframework/boot/logging/logback/defaults.xml" />
+	<property name="LOG_PATTERN"
+		value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m | %mdc %n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}" />
+	<springProfile name="local">
+		<appender name="consoleAppender"
+			class="ch.qos.logback.core.ConsoleAppender">
+			<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+				<level>TRACE</level>
+			</filter>
+			<encoder>
+				<pattern>${FILE_LOG_PATTERN}</pattern>
+			</encoder>
+		</appender>
+		<appender name="dayliRollingFileAppender"
+			class="ch.qos.logback.core.rolling.RollingFileAppender">
+			<file>${LOG_FILE}</file>
+			<rollingPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+				<fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.%i</fileNamePattern>
+				<maxHistory>30</maxHistory>
+				<maxFileSize>10MB</maxFileSize>
+				<totalSizeCap>300MB</totalSizeCap>
+			</rollingPolicy>
+			<encoder
+				class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+				<pattern>${FILE_LOG_PATTERN}</pattern>
+			</encoder>
+		</appender>
 
-    <property name="LOGS" value="./logs" />
+		<logger name="org.quartz.core.JobRunShell" level="DEBUG"
+			additivity="false">
+			<appender-ref ref="consoleAppender" />
+		</logger>
 
-    <appender name="Console"
-        class="ch.qos.logback.core.ConsoleAppender">        
-       	<encoder>
-       		<!-- Fecha | LogLevel | Hilo | Clase asignada al Logger | Clase desde la cual se hizo Logging | Message -->
-      		<pattern>%d{ISO8601} %highlight(%-5level) [%thread] %logger{100} %yellow(%C{1.}) : %msg%n%throwable</pattern>
-    	</encoder>
-    </appender>
+		<root level="INFO">
+			<appender-ref ref="dayliRollingFileAppender" />
+			<appender-ref ref="consoleAppender" />
+		</root>
+	</springProfile>
 
-    <appender name="RollingFile"
-        class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOGS}/spring-boot-logger.log</file>
-        <encoder
-            class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <!-- Fecha | LogLevel | Hilo | Clase desde la cual se hizo Logging | Message -->
-            <Pattern>%d %p [%t] %C{1.} : %m%n</Pattern>
-        </encoder>
-
-        <rollingPolicy
-            class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!-- Se trunca el archivo de log cada día o al superar los 10MB. -->
-            <fileNamePattern>${LOGS}/archived/spring-boot-logger-%d{yyyy-MM-dd}.%i.log
-            </fileNamePattern>
-            <timeBasedFileNamingAndTriggeringPolicy
-                class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>10MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
-        </rollingPolicy>
-    </appender>
-    
-    <!-- LOG por defecto para todos los paquetes a partir del nivel 'INFO' y superiores. -->
-    <root level="info">
-        <appender-ref ref="Console" />
-    </root>
-
-    <!-- LOG para paquetes 'net.atopecode.*' a partir del nivel 'TRACE' y superiores. -->
-    <logger name="net.atopecode" level="trace" additivity="false">
-        <appender-ref ref="RollingFile" />
-        <appender-ref ref="Console" />
-    </logger>
-
+	<springProfile name="!local">
+		<appender name="dayliRollingFileAppender"
+			class="ch.qos.logback.core.rolling.RollingFileAppender">
+			<file>${LOG_FILE}</file>
+			<rollingPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+				<fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.%i</fileNamePattern>
+				<maxHistory>30</maxHistory>
+				<maxFileSize>10MB</maxFileSize>
+				<totalSizeCap>300MB</totalSizeCap>
+			</rollingPolicy>
+			<encoder
+				class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+				<pattern>>${LOG_PATTERN}</pattern>
+			</encoder>
+		</appender>
+		<logger name="org.springframework" level="INFO" />
+		<logger name="pe.backend.challenge.exchange.rate.ws" level="INFO" additivity="false">
+			<appender-ref ref="dayliRollingFileAppender" />
+		</logger>
+		<logger name="org.springframework.batch.core.launch"
+			level="INFO" additivity="false">
+			<appender-ref ref="dayliRollingFileAppender" />
+		</logger>
+		<logger name="org.springframework.batch.core.job" level="INFO"
+			additivity="false">
+			<appender-ref ref="dayliRollingFileAppender" />
+		</logger>
+		<logger name="org.quartz.core.JobRunShell" level="DEBUG"
+			additivity="false">
+			<appender-ref ref="dayliRollingFileAppender" />
+		</logger>
+	</springProfile>
 </configuration>

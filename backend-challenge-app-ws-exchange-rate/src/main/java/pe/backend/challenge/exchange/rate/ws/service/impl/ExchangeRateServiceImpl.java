@@ -16,6 +16,7 @@ import pe.backend.challenge.exchange.rate.ws.dto.ExchangeRateDTO;
 import pe.backend.challenge.exchange.rate.ws.exception.InternalException;
 import pe.backend.challenge.exchange.rate.ws.service.ExchangeRateService;
 import pe.backend.challenge.exchange.rate.ws.util.ApplicationConstants;
+import reactor.core.publisher.Mono;
 import rx.Single;
 
 @Service
@@ -29,14 +30,14 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
 	}
 
 	@Override
-	public Single<ExchangeRateDTO> calculate(ExchangeRateDTO exchangeRateDTO) {
+	public Mono<ExchangeRateDTO> calculate(ExchangeRateDTO exchangeRateDTO) {
 
-		return Single.create(suscriber -> {
+		return Mono.create(suscriber -> {
 			Optional<EntityExchangeRate> entityOptional = exchangeRateRepository
 					.findByFromCurrencyAndToCurrencyAndToDate(exchangeRateDTO.getFrom().getCurrency(),
 							exchangeRateDTO.getTo().getCurrency(), exchangeRateDTO.getDateExchangeRate());
 			if (!entityOptional.isPresent()) 
-				suscriber.onError(new InternalException(HttpStatus.NOT_FOUND, ApplicationConstants.NOT_FOUND_RESOURCE));
+				suscriber.error(new InternalException(HttpStatus.NOT_FOUND, ApplicationConstants.NOT_FOUND_RESOURCE));
 			else {
 				exchangeRateDTO.setBuyValue(entityOptional.get().getBuyValue());
 				exchangeRateDTO.setSaleValue(entityOptional.get().getSaleValue());
@@ -46,7 +47,7 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
 				else if (exchangeRateDTO.getType().equals(ApplicationConstants.PARAM_BUY))
 					exchangeRateDTO.getTo().setAmount(
 							entityOptional.get().getSaleValue().multiply(exchangeRateDTO.getFrom().getAmount()));
-				suscriber.onSuccess(exchangeRateDTO);
+				suscriber.success(exchangeRateDTO);
 			}
 		});
 	}

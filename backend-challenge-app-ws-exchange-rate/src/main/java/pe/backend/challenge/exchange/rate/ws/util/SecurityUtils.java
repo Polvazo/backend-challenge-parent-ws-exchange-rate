@@ -40,7 +40,7 @@ public final class SecurityUtils {
 	
 	public static String getJWTToken(String username) {
 		String secretKey = SECRET;
-		List<GrantedAuthority> grantedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_USER");
+		List<GrantedAuthority> grantedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_ADMIN");
 
 		String token = Jwts.builder().setId(TOKEN_ID).setSubject(username)
 			    .claim(ApplicationConstants.PARAM_AUTHORITIES, grantedAuthorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
