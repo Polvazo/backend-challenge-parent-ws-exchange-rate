@@ -7,6 +7,9 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -55,7 +58,7 @@ public class ApiExchangeRateController extends ApiAbstractController {
 				.map(e -> buildApiResponse(HttpStatus.OK, ApplicationConstants.RESPONSE_SUCCESS, e));
 		
 	}
-    @PreAuthorize("hasRole('USER')")
+
 	@PostMapping(ApplicationEndPoints.RESOURCE_EXCHANGE_RATE)
 	public Single<GenericResponseDTO<ExchangeRateDTO>> create(@Valid @RequestBody ExchangeRateDTO exchangeRateDTO){
 		return exchangeRateService.create(exchangeRateDTO).subscribeOn(rx.schedulers.Schedulers.io())
