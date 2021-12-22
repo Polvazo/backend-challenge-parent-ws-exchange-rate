@@ -19,10 +19,9 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
-import pe.backend.challenge.exchange.rate.ws.controller.util.ApplicationConstants;
+import pe.backend.challenge.exchange.rate.ws.util.ApplicationConstants;
 
 public class JWTAuthorizationFilter extends OncePerRequestFilter {
-	private final static String HEADER = "token-bcp";
 	private final static String PREFIX = "Bearer ";
 	private final static String SECRET = "keyBCP";
 
@@ -48,7 +47,7 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
 	}	
 
 	private Claims validateToken(HttpServletRequest request) {
-		String jwtToken = request.getHeader(HEADER).replace(PREFIX, "");
+		String jwtToken = request.getHeader(ApplicationConstants.HEADER_VALUE_TOKEN).replace(PREFIX, "");
 		return Jwts.parser().setSigningKey(SECRET.getBytes()).parseClaimsJws(jwtToken).getBody();
 	}
 
@@ -63,7 +62,7 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
 	}
 
 	private boolean existJWTToken(HttpServletRequest request, HttpServletResponse res) {
-		String authenticationHeader = request.getHeader(HEADER);
+		String authenticationHeader = request.getHeader(ApplicationConstants.HEADER_VALUE_TOKEN);
 		if (authenticationHeader == null || !authenticationHeader.startsWith(PREFIX))
 			return false;
 		return true;

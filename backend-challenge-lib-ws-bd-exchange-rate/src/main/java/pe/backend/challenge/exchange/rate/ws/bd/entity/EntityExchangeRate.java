@@ -5,6 +5,8 @@ import java.time.LocalDate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
@@ -20,17 +22,17 @@ import pe.backend.challenge.exchange.rate.ws.util.bd.AppConstants;
 public class EntityExchangeRate extends EntityAudit {
 
 	@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@NotBlank(message = "{fromCurrency.notempty}")
+	@NotBlank(message = "{message.fromCurrency.notempty}")
     @Column(name="CURRENCY_ORIGIN")
 	private String fromCurrency;
 
-	@NotBlank(message = "{toCurrency.notempty}")
+	@NotBlank(message = "{message.toCurrency.notempty}")
     @Column(name="CURRENCY_DESTINATION")
 	private String toCurrency;
 	
-	@NotBlank(message = "{toDate.notempty}")
     @Column(name="DATE_EXCHANGE_RATE")
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate toDate;
